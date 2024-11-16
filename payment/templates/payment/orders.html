@@ -1,0 +1,91 @@
+{%extends 'base.html'%}
+{% load static %}
+
+{%include 'navbar.html'%}
+   {%block content%}
+   
+
+  
+  <div class="container">
+    <div class="row">
+        <center>
+            <div class="col-8">
+            <br/><br/>
+
+            <div class="card">
+                <h5 class="card-header">Order {{orders.id}} - ${{orders.amount_paid}}</h5>
+                <div class="card-body">
+                    Email: {{orders.email}}<br/>
+                    {% if orders.date_shipped %}
+                    Date Shipped: {{orders.date_shipped}}
+                    {%else%}
+                    Date Ordered : {{orders.date_ordered}}
+                    {% endif %}
+                    <br/>
+                    {{orders.full_name}}<br/>
+                   <pre>
+                    {{orders.shipping_address}}
+                   </pre>
+                    <br/>
+
+                    <table class="table table-striped table-hover table-borded ">
+                        <thead class="table-dark">
+                          <tr>
+                            
+                            <th scope="col">Product</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                        
+                          </tr>
+                        </thead>
+                        <tbody>
+                           {% for item in items %} 
+                          <tr>
+                            
+                            <td>{{item.product}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>${{item.price}}</td>
+                            
+                          </tr>
+                          {% endfor %}
+                          <tr>
+                            <td></td>
+                            <td><strong>Total</strong></td>
+                            <td> ${{orders.amount_paid}}</td>
+                          </tr>  
+                        </tbody>
+                      </table>
+                     <br/><br/>
+                     {% if not orders.shipped %}
+                     <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="shipping_status" value="true">
+                        <button type="Submit" class="btn btn-success"> Mark As Shipped </button>
+                    
+                    </form>
+                    {% else %}
+                    <form method ="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="shipping_status" value="false">
+                        <button type="Submit" class="btn btn-danger"> Mark As Not Shipped </button>
+                        
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            <br/>
+                <a href="{%url 'home'%}" class="btn btn-primary">Home</a> 
+            </div>
+
+              
+<br/><br/>
+            </div>
+        </center>
+        </div>
+    </div>        
+    
+    
+
+    
+
+   {%endblock%}

@@ -1,0 +1,41 @@
+
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+<div class="container my-5">
+    <div class="bg-body-tertiary p-5 rounded">
+      <div class="col-sm-8 py-5 mx-auto">
+        <center>
+        <h1 class="display-5 fw-normal">Login</h1>
+        <p class="fs-5">Log in to your account...</p>
+        </center>
+        
+    </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+  
+            <form method="POST" action="{% url 'login'%}">
+                {% csrf_token %}
+                <div class="mb-3">
+                 
+                  <input type="text" class="form-control" name="username" placeholder="Enter Your Username">
+                  
+                </div>
+                <div class="mb-3">
+                  
+                  <input type="password" class="form-control" name="password" placeholder="Enter Your Password">
+                </div>
+             
+                <button type="submit" class="btn btn-primary">Login</button>
+               
+            </form>
+            <br/><br/>
+            <br/><br/>
+            <br/><br/>
+            <br/><br/>
+            <br/><br/>
+            <br/><br/>
+
+ {%endblock%}
