@@ -46,9 +46,17 @@ def billing_info(request):
         #Create a session with Shipping Info
         my_shipping =request.POST
         request.session['my_shipping'] = my_shipping
-
+        #Gather Order Info
+        full_name = my_shipping['shipping_full_name']
+        email=my_shipping['shipping_email']
+        #Create Shipping Address from session info
+        shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_zipcode']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_country']}"
+        amount_paid= totals
         #Get the host
         host =request.get_host()
+        #Create Invoice Form Dictionary
+        my_invoice =str(uuid.uuid4())
+        #Create Order
 
         #Create Paypal Form and stuff
         paypal_dict ={
@@ -56,7 +64,7 @@ def billing_info(request):
             'amount' : totals ,
             'item_name' :'Book Order',
             'no_shipping' : '2',
-            'invoice' : str(uuid.uuid4()),
+            'invoice' : my_invoice,
             'currency_code': 'USD',
             'notify_url': 'https://{}{}'.format(host, reverse("paypal-ipn")),
 			'return_url': 'https://{}{}'.format(host, reverse("payment_success")),
@@ -72,11 +80,61 @@ def billing_info(request):
 
         #Check to see if user is logged in
         if request.user.is_authenticated:
+            
             billing_form =PaymentForm()
+              #log in
+            user= request.user
+            #Create Order
+            create_order =Order(user=user,full_name=full_name,email=email,shipping_address=shipping_address,amount_paid=amount_paid,invoice=my_invoice)
+            create_order.save()
+            #Add order items
+            order_id = create_order.pk 
+            for product in cart_products():
+                product_id = product.id 
+                if product.is_sale:
+                    price =product.sale_price
+                else:
+                    price = product.price
+
+                for key,value in quantities().items():
+                        if int(key) == product.id:
+                            #Create order item
+                            create_order_item = OrderItem(order_id=order_id,product_id=product_id,user=user,quantity=value,price=price)
+                            create_order_item.save()
+           
+                     #Delete Cart from Database (old_cart field)
+            current_user = Profile.objects.filter(user__id=request.user.id)
+            current_user.update(old_cart="")
+            messages.success(request,"Order Placed!")
+            
+
+
             return render(request,'payment/billing_info.html',{"paypal_form":paypal_form,"cart_products":cart_products ,"quantities":quantities,"totals":totals,"shipping_info":request.POST,"billing_form":billing_form})
         else:
         #Not log in
             billing_form =PaymentForm()
+            #not log in
+            create_order =Order(full_name=full_name,email=email,shipping_address=shipping_address,amount_paid=amount_paid,invoice=my_invoice)
+            create_order.save()
+            order_id = create_order.pk 
+            for product in cart_products():
+                product_id = product.id 
+                if product.is_sale:
+                    price =product.sale_price
+                else:
+                    price = product.price
+
+                for key,value in quantities().items():
+                        if int(key) == product.id:
+                            #Create order item
+                            create_order_item = OrderItem(order_id=order_id,product_id=product_id,quantity=value,price=price)
+                            create_order_item.save()
+            #Delete our cart
+            for key in list(request.session.keys()):
+                if key == "session_key":
+                    #Delete the key
+                    del request.session[key]
+
             return render(request,'payment/billing_info.html',{"paypal_form":paypal_form,"cart_products":cart_products ,"quantities":quantities,"totals":totals,"shipping_info":request.POST,"billing_form":billing_form})
         
     else:
