@@ -9,7 +9,7 @@ import datetime
 #Import Some Paypal Stuff
 from django.urls import reverse
 from paypal.standard.forms import PayPalPaymentsForm
-from  ecom.ecom import settings
+from  django.conf import settings
 import uuid #unique user id for duplicate orders
 
 
