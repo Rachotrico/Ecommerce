@@ -83,7 +83,7 @@ $(document).on('click', '.add-cart', function(e){
       success: function(json){
           //console.log(json)
           //document.getElementById("cart_quantity").textContent = json.qty
-          location.replace('https://ecommerce-production-b883.up.railway.app/');
+          location.replace("{{url 'home'}}");
       },
 
       error: function(xhr, errmsg, err){
