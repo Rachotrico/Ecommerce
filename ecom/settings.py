@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'cart',
     'payment',
     'whitenoise.runserver_nostatic',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -148,3 +149,9 @@ MEDIA_ROOT= os.path.join(BASE_DIR,'static/media')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Add paypal settings
+#Set Sandbox to true
+PAYPAL_TEST = True
+
+PAYPAL_RECIEVE_EMAIL = 'business@companytest.com'
